@@ -1,26 +1,28 @@
 use std::collections::HashMap;
-use utils::{read_lines, from_input_line_to_i32_tuple};
+use utils::{read_lines, from_input_line_to_i32s};
 
 
 fn main() {
     println!("Please run tests to get the resuls!");
 }
 
-//TODO: add proper error handling
 fn exe1(filename: &str) -> i32 {
     let lines = read_lines(filename);
 
     let mut numbers_left: Vec<i32> = Vec::new();
-    let mut numbers_right:Vec <i32> = Vec::new();
+    let mut numbers_right: Vec<i32> = Vec::new();
 
     // read and parse input into i32 tuple
     for line in lines {
-        let result = from_input_line_to_i32_tuple(&line);
+        let result = from_input_line_to_i32s(&line,2);
         
-        let tuple = result.unwrap();
-
-        numbers_left.push(tuple.0);
-        numbers_right.push(tuple.1);
+        match result {
+            Ok(v) => {
+                numbers_left.push(v[0]);
+                numbers_right.push(v[1]);
+            }
+            Err(e) => print!("err: {}",e)
+        }
     }
 
     numbers_left.sort();
@@ -38,7 +40,6 @@ fn exe1(filename: &str) -> i32 {
     distance_sum
 }
 
-//TODO: add proper error handling
 fn exe2(filename: &str) -> i32 {
     let lines = read_lines(filename);
 
@@ -47,12 +48,15 @@ fn exe2(filename: &str) -> i32 {
 
     // read and parse input into i32 tuple
     for line in lines {
-        let result = from_input_line_to_i32_tuple(&line);
+        let result = from_input_line_to_i32s(&line,2);
         
-        let tuple = result.unwrap();
-
-        numbers_left.push(tuple.0);
-        numbers_right.push(tuple.1);
+        match result {
+            Ok(v) => {
+                numbers_left.push(v[0]);
+                numbers_right.push(v[1]);
+            }
+            Err(e) => print!("err: {}",e)
+        }
     }
 
     // create frequency map for the right numbers

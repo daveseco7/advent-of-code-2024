@@ -1,7 +1,7 @@
 use utils::{read_lines, from_input_line_to_i32_tuple};
 
 fn main() {
-    println!("Hello, world!");
+    println!("Please run tests to get the resuls!");
 }
 
 fn exe1(filename: &str) -> i32 {

@@ -12,7 +12,7 @@ pub fn read_lines(filename: &str) -> Vec<String> {
     .collect()
 }
 
-pub fn from_input_line_to_i32s(line: &str, expected_line_width: usize) -> Result<Vec<i32>, InputError> {
+pub fn from_input_line_to_i32s(line: &str, expected_line_width: i32) -> Result<Vec<i32>, InputError> {
     let line_args = line.split_whitespace()
     .into_iter()
     .map(|n| match n.parse::<i32>() {
@@ -22,10 +22,17 @@ pub fn from_input_line_to_i32s(line: &str, expected_line_width: usize) -> Result
     .collect::<Result<Vec<i32>, InputError>>();
 
 
+    if expected_line_width < 0 {
+        // No column width validation expected.
+        return line_args
+    }
+
     match line_args {
         Ok(line_args) => {
+           let len = i32::try_from(line_args.len())?;
+           
            // validate the expected number of arguments per line
-            if line_args.len() != expected_line_width {
+            if len != expected_line_width {
                 return Err(InputError::UnexpectedLineColumnWidth)
             } 
             Ok(line_args)

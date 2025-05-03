@@ -3,46 +3,41 @@ use std::error::Error;
 use std::fs::read_to_string;
 use std::num::ParseIntError;
 
-// TODO: add tests and error handling to this package
 pub fn read_lines(filename: &str) -> Vec<String> {
     read_to_string(filename)
-    .expect("something went wrong trying to read input file")
-    .lines()
-    .map(String::from)
-    .collect()
+        .expect("something went wrong trying to read input file")
+        .lines()
+        .map(String::from)
+        .collect()
 }
 
-pub fn from_input_line_to_i32s(line: &str, expected_line_width: i32) -> Result<Vec<i32>, InputError> {
-    let line_args = line.split_whitespace()
-    .into_iter()
-    .map(|n| match n.parse::<i32>() {
-        Ok(n) => Ok(n),
-        Err(e) => Err(InputError::ParseError(e))
-    })
-    .collect::<Result<Vec<i32>, InputError>>();
-
-
-    if expected_line_width < 0 {
-        // No column width validation expected.
-        return line_args
-    }
+pub fn from_input_line_to_vec_i32s(
+    line: &str,
+    expected_column_number: usize,
+) -> Result<Vec<i32>, InputError> {
+    let line_args = line
+        .split_whitespace()
+        .into_iter()
+        .map(|n| match n.parse::<i32>() {
+            Ok(n) => Ok(n),
+            Err(e) => Err(InputError::ParseError(e)),
+        })
+        .collect::<Result<Vec<i32>, InputError>>();
 
     match line_args {
         Ok(line_args) => {
-           let len = i32::try_from(line_args.len())?;
-           
-           // validate the expected number of arguments per line
-            if len != expected_line_width {
-                return Err(InputError::UnexpectedLineColumnWidth)
-            } 
+            // validate the expected number of arguments per line
+            if line_args.len() != expected_column_number {
+                return Err(InputError::UnexpectedLineColumnWidth);
+            }
+
             Ok(line_args)
         }
         Err(e) => Err(e),
     }
 }
 
-
-// Custom error to be returned when something went wrong while parsing 
+// Custom error to be returned when something went wrong while parsing
 // the input to something the downstream program can execute.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InputError {
@@ -56,41 +51,47 @@ impl Error for InputError {}
 impl fmt::Display for InputError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            InputError::ParseError(e) =>
-                write!(f, "invalid i32s provided as str, err: {}",e),
-            InputError::UnexpectedLineColumnWidth =>
-                write!(f,"invalid number of columns provided"),
+            InputError::ParseError(e) => write!(f, "invalid i32s provided as str, err: {}", e),
+            InputError::UnexpectedLineColumnWidth => {
+                write!(f, "invalid number of columns provided")
+            }
         }
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use core::panic;
-
     use super::*;
 
     #[test]
-    fn tst_from_input_line_to_i32s_ok() {
-        let result = from_input_line_to_i32s("1 2 3 43", 4); 
+    fn test_read_lines_ok() {
+        let lines = read_lines("src/lib.rs");
+        assert_ne!(lines.len(), 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_read_lines_not_found_error() {
+        read_lines("random");
+    }
+
+    #[test]
+    fn test_from_input_line_to_i32s_ok() {
+        let result = from_input_line_to_vec_i32s("1 2 3 43", 4);
         let result = result.unwrap();
 
-        assert_eq!(result, Vec::from([1,2,3,43]));
+        assert_eq!(result, Vec::from([1, 2, 3, 43]));
     }
 
     #[test]
-    fn tst_from_input_line_to_i32s_parse_error() {
-        let err = from_input_line_to_i32s("1 t 3 43", 4).unwrap_err();
-        match err {
-            InputError::ParseError(_) => {},
-            e => panic!("expected parse error, got err: {}", e),
-        }
+    fn test_from_input_line_to_i32s_parse_error() {
+        let result = from_input_line_to_vec_i32s("1 t 3 43", 4);
+        assert!(matches!(result, Err(InputError::ParseError(_))));
     }
 
     #[test]
-    fn tst_from_input_line_to_i32s_unexpected_line_column_width() {
-        let err = from_input_line_to_i32s("1 2 3 43", 2).unwrap_err(); 
+    fn test_from_input_line_to_i32s_unexpected_line_column_width() {
+        let err = from_input_line_to_vec_i32s("1 2 3 43", 2).unwrap_err();
         assert_eq!(err, InputError::UnexpectedLineColumnWidth);
     }
 }

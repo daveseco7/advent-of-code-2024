@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use utils::{read_lines, from_input_line_to_i32s};
+use utils::{read_lines, from_input_line_to_vec_i32s};
 
 
 fn main() {
@@ -14,7 +14,7 @@ fn exe1(filename: &str) -> i32 {
 
     // read and parse input into i32 tuple
     for line in lines {
-        let result = from_input_line_to_i32s(&line,2);
+        let result = from_input_line_to_vec_i32s(&line,2);
         
         match result {
             Ok(v) => {
@@ -48,7 +48,7 @@ fn exe2(filename: &str) -> i32 {
 
     // read and parse input into i32 tuple
     for line in lines {
-        let result = from_input_line_to_i32s(&line,2);
+        let result = from_input_line_to_vec_i32s(&line,2);
         
         match result {
             Ok(v) => {
